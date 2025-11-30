@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Movie Recommender — Discover & Track Your Favorites</title>
+    <meta name="description"
+        content="Discover trending movies, get personalized recommendations, and manage your favorite films all in one place." />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="ui-enhancements.css" />
+    <link rel="stylesheet" href="favorite-heart.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="logo-container">
+            <img src="MyLogo.png" alt="MoviNest Logo" class="site-logo">
+            <h1>MoviNest</h1>
+        </div>
+        <div class="search-wrap">
+            <input id="searchInput" placeholder="Search movies by title..." aria-label="Search movies" />
+            <button id="searchBtn" aria-label="Search">Search</button>
+            <button id="filterToggle" class="filter-toggle-btn" aria-label="Toggle filters panel" aria-expanded="false">
+                🔽 Filters
+            </button>
+        </div>
+    </header>
+
+    <!-- Filter Panel -->
+    <aside id="filterPanel" class="filter-panel" role="complementary" aria-label="Movie filters">
+        <div class="filter-header">
+            <h3 id="filterPanelTitle">Filters</h3>
+            <button id="closeFilters" class="close-filters" aria-label="Close filters panel">✕</button>
+        </div>
+
+        <!-- Active Filters Chips -->
+        <div id="activeFilters" class="filter-chips-container" role="region" aria-label="Active filters"
+            aria-live="polite"></div>
+
+        <!-- Genre Filter -->
+        <div class="filter-section">
+            <label class="filter-label" id="genreLabel">Genre</label>
+            <div id="genreChips" class="genre-chips" role="group" aria-labelledby="genreLabel"></div>
+        </div>
+
+        <!-- Year Range -->
+        <div class="filter-section">
+            <label class="filter-label" id="yearLabel">Release Year</label>
+            <div class="year-inputs" role="group" aria-labelledby="yearLabel">
+                <input type="number" id="yearMin" placeholder="1900" min="1900" max="2025" aria-label="Minimum year" />
+                <span class="dash" aria-hidden="true">—</span>
+                <input type="number" id="yearMax" placeholder="2025" min="1900" max="2025" aria-label="Maximum year" />
+            </div>
+        </div>
+
+        <!-- Rating Slider -->
+        <div class="filter-section">
+            <label class="filter-label" id="ratingLabel">Rating (IMDb)</label>
+            <div class="rating-display" aria-live="polite">
+                <span id="ratingMinDisplay">0</span> - <span id="ratingMaxDisplay">10</span>
+            </div>
+            <div class="range-slider" role="group" aria-labelledby="ratingLabel">
+                <input type="range" id="ratingMin" min="0" max="10" step="0.5" value="0" aria-label="Minimum rating" />
+                <input type="range" id="ratingMax" min="0" max="10" step="0.5" value="10" aria-label="Maximum rating" />
+            </div>
+        </div>
+
+        <!-- Runtime Slider -->
+        <div class="filter-section">
+            <label class="filter-label" id="runtimeLabel">Runtime (minutes)</label>
+            <div class="rating-display" aria-live="polite">
+                <span id="runtimeMinDisplay">0</span> - <span id="runtimeMaxDisplay">300</span>
+            </div>
+            <div class="range-slider" role="group" aria-labelledby="runtimeLabel">
+                <input type="range" id="runtimeMin" min="0" max="300" step="10" value="0"
+                    aria-label="Minimum runtime in minutes" />
+                <input type="range" id="runtimeMax" min="0" max="300" step="10" value="300"
+                    aria-label="Maximum runtime in minutes" />
+            </div>
+        </div>
+
+        <!-- Language Filter -->
+        <div class="filter-section">
+            <label class="filter-label" for="languageSelect">Language</label>
+            <select id="languageSelect" aria-label="Select movie language">
+                <option value="">All Languages</option>
+            </select>
+        </div>
+
+        <!-- Sort By -->
+        <div class="filter-section">
+            <label class="filter-label" for="sortSelect">Sort By</label>
+            <select id="sortSelect" aria-label="Sort movies by">
+                <option value="popularity.desc">Most Popular</option>
+                <option value="vote_average.desc">Highest Rated</option>
+                <option value="primary_release_date.desc">Newest</option>
+                <option value="primary_release_date.asc">Oldest</option>
+                <option value="revenue.desc">Highest Revenue</option>
+            </select>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+            <button id="applyFilters" class="apply-filters-btn cool-btn">
+                <span class="btn-text">Apply Filters</span>
+                <span class="btn-loader"></span>
+            </button>
+
+            <button id="clearFilters" class="clear-filters-btn clear-btn">
+                Clear All
+            </button>
+        </div>
+
+    </aside>
+
+    <main role="main">
+        <section>
+            <h2>Trending This Week</h2>
+            <div id="trendingGrid" class="grid" role="feed" aria-label="Trending movies"></div>
+        </section>
+
+        <section>
+            <h2>Custom Recommendations</h2>
+            <p class="section-desc">Based on your favorite movies</p>
+            <div id="recommendGrid" class="grid" role="feed" aria-label="Recommended movies"></div>
+        </section>
+
+        <section>
+            <h2>My Favorites</h2>
+            <div id="favoritesGrid" class="grid" role="feed" aria-label="Your favorite movies"></div>
+        </section>
+    </main>
+
+    <!-- Movie Details Modal -->
+    <div id="movieModal" class="modal hidden" role="dialog" aria-labelledby="modalTitle" arial-modal="true">
+        <div class="modal-content">
+            <button id="closeModal" class="close" aria-label="Close movie details">✕</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript for green fill effect on white slider tracks -->
+    <script>
+        // Function to update slider background with green fill
+        function updateSliderBackground(slider) {
+            const min = parseFloat(slider.min);
+            const max = parseFloat(slider.max);
+            const value = parseFloat(slider.value);
+            const percentage = ((value - min) / (max - min)) * 100;
+
+            // Create linear gradient: green from 0 to current value%, white for the rest
+            slider.style.background = `linear-gradient(to right, #00FF00 0%, #00FF00 ${percentage}%, #FFFFFF ${percentage}%, #FFFFFF 100%)`;
+        }
+
+        // Apply to all range sliders when DOM loads
+        document.addEventListener('DOMContentLoaded', function () {
+            const sliders = document.querySelectorAll('.range-slider input[type="range"]');
+
+            sliders.forEach(slider => {
+                // Initial update
+                updateSliderBackground(slider);
+
+                // Update on input change
+                slider.addEventListener('input', function () {
+                    updateSliderBackground(this);
+                });
+            });
+        });
+    </script>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

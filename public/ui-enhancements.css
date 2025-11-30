@@ -1,0 +1,168 @@
+/* Loading Button Styles */
+.apply-filters-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.apply-filters-btn.loading .btn-text {
+    opacity: 0;
+}
+
+.apply-filters-btn.loading .btn-loader {
+    display: inline-block !important;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Smooth Focus Styles */
+*:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Skeleton Loader for Genre Chips */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.genre-chips.loading {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.genre-chip-skeleton {
+    width: 80px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Improved Transitions */
+.genre-chip {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.genre-chip:active {
+    transform: scale(0.95);
+}
+
+input[type="number"],
+select {
+    transition: all 0.2s ease;
+}
+
+input[type="number"]:focus,
+select:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+}
+
+/* Filter Panel Smooth Slide */
+.filter-panel {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+/* Card Hover Animation */
+.card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.card:focus-within {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(2, 6, 23, 0.9);
+}
+
+/* Loading State for Grid */
+.grid.loading::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Improved Mobile Touch Targets */
+@media (max-width: 768px) {
+    .genre-chip {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 12px 16px;
+    }
+
+    .filter-toggle-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    button,
+    input,
+    select {
+        min-height: 44px;
+    }
+}
+
+/* Reduced Motion for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .genre-chip {
+        border-width: 2px;
+    }
+
+    .btn {
+        border-width: 2px;
+    }
+}

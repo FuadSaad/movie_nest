@@ -1,0 +1,36 @@
+/* Favorite Button Styles */
+.btn.primary.favorited {
+    background: #ff5252;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+}
+
+.btn.primary.favorited:hover {
+    background: #ff6b6b;
+    transform: scale(1.05);
+}
+
+/* Heart animation */
+@keyframes heartBeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    25% {
+        transform: scale(1.2);
+    }
+
+    50% {
+        transform: scale(1);
+    }
+}
+
+.btn.primary.favorited {
+    animation: heartBeat 0.5s ease;
+}
